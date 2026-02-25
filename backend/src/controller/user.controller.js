@@ -5,14 +5,14 @@ import jwt from 'jsonwebtoken';
 import { UserData } from '../model/userData.model.js';
 import mongoose from 'mongoose';
 import crypto from 'crypto';
-import nodemailer from "nodemailer";
+import nodemailer from 'nodemailer';
 
 dotenv.config();
 
 const SECRET_KEY = process.env.SECRET_KEY;
 
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  service: 'gmail',
   auth: {
     user: process.env.EMAIL,
     pass: process.env.EMAIL_PASSWORD,
@@ -23,44 +23,42 @@ export const createUser = async (req, res, next) => {
   try {
     const { email, password, userName } = req.body;
     const hashedPassword = await bcrypt.hash(password, 12);
-     const verfication_token = crypto.randomBytes(32).toString("hex");
+    const verfication_token = crypto.randomBytes(32).toString('hex');
     const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
-    const newUser = await User.create({
+    const user = await User.create({
       email,
       password: hashedPassword,
       userName,
-       isVerified: false,
-        verfication_token: verfication_token,
-        verfication_token_expires: expires
-      
+      isVerified: false,
+      verfication_token: verfication_token,
+      verfication_token_expires: expires,
     });
-    var token = await jwt.sign(
-      { userName: userName, email: email, id: newUser._id },
+    var jwtToken = await jwt.sign(
+      { userName: userName, email: email, id: user._id },
       SECRET_KEY,
     );
 
-    const resetLink = `http://localhost:3000/verify/${verfication_token}`;
-    
+    const verifyLink = `${process.env.CLIENT_URL}/verify/${verfication_token}`;
+
     await transporter.sendMail({
-  from: process.env.EMAIL,
-  to: email,
-  subject: "Verify Mail",
-  html: `
+      from: process.env.EMAIL,
+      to: email,
+      subject: 'Verify Mail',
+      html: `
     <h3>Verify Your Mail</h3>
     <p>Click below link to verify your mail</p>
-    <a href="${resetLink}">Verify</a>
+    <a href="${verifyLink}">Verify</a>
   `,
-});
-   
+    });
+
     return res.status(201).json({
       success: true,
       message: 'User created successfully',
-      token: token,
+      token: jwtToken,
       data: {
-        id: newUser._id,
-        email: newUser.email,
-        userName: newUser.userName,
-       
+        id: user._id,
+        email: user.email,
+        userName: user.userName,
       },
     });
   } catch (error) {
@@ -73,54 +71,48 @@ export const createUser = async (req, res, next) => {
 };
 
 export const getUserData = async (req, res, next) => {
-  console.log(req.headers)
-  const token = req.headers.authorization;
-  console.log(token, 'tttttt')
-  const userDetails = JSON.parse(
-    Buffer.from(token.split('.')[1], 'base64').toString(),
-  );
-  console.log(userDetails);
   try {
-    const response = await UserData.findOne({
-      user_id: new mongoose.Types.ObjectId(userDetails.id),
+    const userId = req.user.id;
+    const data = await UserData.findOne({
+      user_id: new mongoose.Types.ObjectId(userId.id),
     });
-    return res.send({
-      status: 200,
+    res.status(200).json({
       success: true,
-      data: response,
+      data,
     });
   } catch (error) {
-    return res.send({
-      status : 500,
-      error: true,
-      message: 'internal server error'
-    })
+   next(error)
   }
 };
 
+export const verifyEmailToken = async (req, res, next) => {
+  try {
+    const {token} = req.params;
+  const user = await User.findOne({
+    verfication_token: token,
+    verfication_token_expires: { $gt: Date.now() },
 
-export const verifyEmailToken = async (req, res, next) =>{
-  const rowToken = req.params.token;
-const user = await User.findOne({
-    verfication_token : rowToken
   });
 
-  if(!user) {
-    return res.status(400).json('Invalid token"');
+ if (!user) {
+      return res.status(400).json({ message: "Invalid or expired token" });
+    }
+
+
+ 
+
+  user.isVerified = true;
+  user.verfication_token = undefined;
+  user.verfication_token_expires = undefined;
+
+  await user.save();
+      res.status(200).json({
+      success: true,
+      message: "Email verified successfully",
+    });
+  } catch (error) {
+        next(error);
+
   }
 
-  if (user.verfication_token_expires < Date.now()) {
-  return res.status(400).json({ message: "Token expired" });
-}
-
-user.isVerified = true;
-user.verfication_token = undefined;
-user.verfication_token_expires = undefined;
-
-
-await user.save();
-res.send({
-  success : true,
-  message: "Email verified successfully"
-})
-}
+};
