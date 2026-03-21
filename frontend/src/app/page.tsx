@@ -1,6 +1,6 @@
 
 
-import { Home } from '@/src/component/Home/Home';
+import { Home } from '@/src/components/home/Home';
 
 
 

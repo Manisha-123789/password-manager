@@ -1,4 +1,5 @@
 'use client'
+import { authService } from '@/src/services/auth.service';
 import { apiCall } from '@/src/utils/apiCall';
 import { use, useEffect } from 'react'
  
@@ -15,12 +16,7 @@ export default function BlogPostPage({
   const verifyToken = async () =>{
       
     try {
-         const response = await apiCall({
-              method: 'GET',
-              url: `http://localhost:8000/user/verify/${slug}`,
-              body: {
-              },
-            });
+         const response = await authService.verifyEmail(slug);
             console.log(response, 'rrrrrrrrrrrrrr')
     } catch (error) {
         

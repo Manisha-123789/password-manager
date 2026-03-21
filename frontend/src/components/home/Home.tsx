@@ -1,6 +1,8 @@
 'use client';
 
-import { setAuthenticate } from '@/redux/features/auth/authSlice';
+import { api } from '@/src/lib/axios';
+import { setAuthenticate } from '@/src/redux/features/auth/authSlice';
+import { userService } from '@/src/services/user.service';
 import { apiCall } from '@/src/utils/apiCall';
 import { Alert, Box, Button, Typography } from '@mui/material';
 import { useRouter } from 'next/navigation';
@@ -20,13 +22,10 @@ export const Home = () => {
   const { isAuthenticated } = useSelector((state: any) => state.auth);
 
   useEffect(() => {
+    if(!isAuthenticated) return;
     const fetchUserData = async () => {
       try {
-        const response = await apiCall({
-          method: 'GET',
-          url: `${process.env.NEXT_PUBLIC_API_URL}/user/password`,
-          body: null,
-        });
+        const response = await userService.getPasswords();
         if (response.status === 200 && response.success) {
           setData(response.data);
         } else {
