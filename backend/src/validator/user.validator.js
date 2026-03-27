@@ -10,7 +10,6 @@ export const validateCredentials = [
     .isEmail()
     .withMessage('Invalid email')
     .bail()
-    .normalizeEmail()
     .custom(async (value) => {
       const existingUser = await User.findOne({ email: value }).lean();
 

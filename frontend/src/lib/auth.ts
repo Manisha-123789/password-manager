@@ -12,7 +12,7 @@ export const useAuth = () => {
     const token = localStorage.getItem("token");
 
     if (token) {
-      dispatch(setAuthenticate(true));
+      // dispatch(setAuthenticate(true));
     } else {
       console.log('logout')
     }

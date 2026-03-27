@@ -18,9 +18,17 @@ interface PasswordData {
 export const Home = () => {
   const [data, setData] = useState<PasswordData | {}>({});
   const [error, setError] = useState<string | null>(null);
+  const [isAuthenticated, setIsAuthenticate] = useState<boolean>(false);
   const router = useRouter();
-  const { isAuthenticated } = useSelector((state: any) => state.auth);
 
+  useEffect(()=>{
+const auth = localStorage.getItem('authenticate');
+if(auth){
+  setIsAuthenticate(JSON.parse(auth));
+}
+  },[])
+  
+  console.log(isAuthenticated)
   useEffect(() => {
     if(!isAuthenticated) return;
     const fetchUserData = async () => {
@@ -41,7 +49,7 @@ export const Home = () => {
 
   return (
     <>
-      {isAuthenticated ? (
+      {!isAuthenticated ? (
         <Box>
           <Typography>SecureVault</Typography>
           <Typography>
@@ -59,7 +67,9 @@ export const Home = () => {
           <Typography>User Name: {data?.user_name}</Typography>
         </>
       ) : (
-        <Typography>No Data Found</Typography>
+      <>  
+      <Typography>Your vault is empty</Typography>
+      <Typography>Save your passwords here to keep them safe and easy to access anytime.</Typography></>
       )}
     </>
   );

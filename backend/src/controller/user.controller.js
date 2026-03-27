@@ -2,6 +2,7 @@ import { User } from '../model/auth.model.js';
 import bcrypt from 'bcryptjs';
 import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
+import { jwtDecode } from 'jwt-decode';
 import { UserData } from '../model/userData.model.js';
 import mongoose from 'mongoose';
 import crypto from 'crypto';
@@ -33,10 +34,6 @@ export const createUser = async (req, res, next) => {
       verfication_token: verfication_token,
       verfication_token_expires: expires,
     });
-    var jwtToken = await jwt.sign(
-      { userName: userName, email: email, id: user._id },
-      SECRET_KEY,
-    );
 
     const verifyLink = `${process.env.CLIENT_URL}/verify/${verfication_token}`;
 
@@ -54,7 +51,6 @@ export const createUser = async (req, res, next) => {
     return res.status(201).json({
       success: true,
       message: 'User created successfully',
-      token: jwtToken,
       data: {
         id: user._id,
         email: user.email,
@@ -70,6 +66,48 @@ export const createUser = async (req, res, next) => {
   }
 };
 
+export const loginUser = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+    
+    const user = await User.findOne({ email }).select('+password');
+    
+    if (user) {
+      const isMatch = await bcrypt.compare(password, user.password);
+
+      if (isMatch) {
+        return res.status(200).json({
+          message: 'user login successfully',
+        })
+      } else {
+        return res.status(400).json({
+          message: 'Invalid email or password',
+        });
+      }
+    } else {
+      return res.status(400).json({
+        message: 'Invalid email or password',
+      });
+    }
+  } catch (error) {
+    console.log(error, 'eeeeeeeee');
+  }
+};
+
+export const getUser = async (req, res, next) => {
+  const { token } = req.body;
+  const decode = jwtDecode(token);
+  
+  const user = await User.findOne({ email: decode.email });
+  
+  return res.status(200).json({
+    id: user._id,
+    email: user.email,
+    userName: user.userName,
+    isVerified: user.isVerified,
+  });
+};
+
 export const getUserData = async (req, res, next) => {
   try {
     const userId = req.user.id;
@@ -81,38 +119,38 @@ export const getUserData = async (req, res, next) => {
       data,
     });
   } catch (error) {
-   next(error)
+    next(error);
   }
 };
 
 export const verifyEmailToken = async (req, res, next) => {
   try {
-    const {token} = req.params;
-  const user = await User.findOne({
-    verfication_token: token,
-    verfication_token_expires: { $gt: Date.now() },
+    const { token } = req.params;
+    const user = await User.findOne({
+      verfication_token: token,
+      verfication_token_expires: { $gt: Date.now() },
+    });
 
-  });
-
- if (!user) {
-      return res.status(400).json({ message: "Invalid or expired token" });
+    if (!user) {
+      return res.status(400).json({ message: 'Invalid or expired token' });
     }
 
+    var jwtToken = await jwt.sign(
+      { userName: user.userName, email: user.email, id: user._id },
+      SECRET_KEY,
+    );
 
- 
+    user.isVerified = true;
+    user.verfication_token = undefined;
+    user.verfication_token_expires = undefined;
 
-  user.isVerified = true;
-  user.verfication_token = undefined;
-  user.verfication_token_expires = undefined;
-
-  await user.save();
-      res.status(200).json({
+    await user.save();
+    res.status(200).json({
       success: true,
-      message: "Email verified successfully",
+      token: jwtToken,
+      message: 'Email verified successfully',
     });
   } catch (error) {
-        next(error);
-
+    next(error);
   }
-
 };

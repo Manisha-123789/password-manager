@@ -41,7 +41,7 @@ export const validateUser = (req, res, next) => {
       success: false,
       error: {
         code: 'VALIDATION_ERROR',
-        message: 'Validation failed',
+        message: errors.array()[0].msg,
         details: errors.array().map(err => ({
           field: err.path,
           message: err.msg,

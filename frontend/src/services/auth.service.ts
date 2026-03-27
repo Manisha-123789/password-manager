@@ -16,6 +16,10 @@ class AuthService extends BaseService {
   async verifyEmail(token: string) {
     return this.get<any>(`/user/verify/${token}`);
   }
+
+  async getUser(data : {token : string}){
+    return this.post<any>("/user/about/me", data)
+  }
 }
 
 export const authService = new AuthService();
