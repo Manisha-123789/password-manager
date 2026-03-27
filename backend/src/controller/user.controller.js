@@ -69,16 +69,21 @@ export const createUser = async (req, res, next) => {
 export const loginUser = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-    
+
     const user = await User.findOne({ email }).select('+password');
-    
+
     if (user) {
       const isMatch = await bcrypt.compare(password, user.password);
+      var jwtToken = await jwt.sign(
+        { userName: user.userName, email: user.email, id: user._id },
+        SECRET_KEY,
+      );
 
       if (isMatch) {
         return res.status(200).json({
           message: 'user login successfully',
-        })
+          token : jwtToken
+        });
       } else {
         return res.status(400).json({
           message: 'Invalid email or password',
@@ -97,9 +102,9 @@ export const loginUser = async (req, res, next) => {
 export const getUser = async (req, res, next) => {
   const { token } = req.body;
   const decode = jwtDecode(token);
-  
+
   const user = await User.findOne({ email: decode.email });
-  
+
   return res.status(200).json({
     id: user._id,
     email: user.email,

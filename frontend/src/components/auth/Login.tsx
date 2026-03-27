@@ -42,6 +42,10 @@ const Login = () => {
     } else {
       try {
         const response = await authService.login(form);
+        const token = response.token;
+        localStorage.setItem('token', token);
+        localStorage.setItem('authenticate', JSON.stringify(true));
+        router.push('/');
       } catch (error) {
         console.log(error?.response);
         setApiError(error.response.data.message ?? 'Something went wrong')

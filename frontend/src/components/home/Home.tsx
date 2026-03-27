@@ -22,13 +22,13 @@ export const Home = () => {
   const router = useRouter();
 
   useEffect(()=>{
-const auth = localStorage.getItem('authenticate');
-if(auth){
-  setIsAuthenticate(JSON.parse(auth));
+const isVerified = localStorage.getItem('authenticate');
+const token = localStorage.getItem('token');
+if(isVerified && token){
+  setIsAuthenticate(JSON.parse(isVerified));
 }
   },[])
   
-  console.log(isAuthenticated)
   useEffect(() => {
     if(!isAuthenticated) return;
     const fetchUserData = async () => {
