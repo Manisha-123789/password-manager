@@ -21,16 +21,16 @@ export const Home = () => {
   const [isAuthenticated, setIsAuthenticate] = useState<boolean>(false);
   const router = useRouter();
 
-  useEffect(()=>{
-const isVerified = localStorage.getItem('authenticate');
-const token = localStorage.getItem('token');
-if(isVerified && token){
-  setIsAuthenticate(JSON.parse(isVerified));
-}
-  },[])
-  
   useEffect(() => {
-    if(!isAuthenticated) return;
+    const isVerified = localStorage.getItem('authenticate');
+    const token = localStorage.getItem('token');
+    if (isVerified && token) {
+      setIsAuthenticate(JSON.parse(isVerified));
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
     const fetchUserData = async () => {
       try {
         const response = await userService.getPasswords();
@@ -40,17 +40,18 @@ if(isVerified && token){
           setError('Failed to fetch data');
           // router.push("signup");
         }
-      } catch (err) {
+      } catch (error) {
         setError('An error occurred while fetching data');
       }
     };
     fetchUserData();
-  }, []);
+  }, [isAuthenticated]);
 
   return (
     <>
       {!isAuthenticated ? (
         <Box>
+          {error && <Alert>{error}</Alert>}
           <Typography>SecureVault</Typography>
           <Typography>
             Your Passwords. Protected. Organized. Accessible. Manage all your
@@ -67,9 +68,13 @@ if(isVerified && token){
           <Typography>User Name: {data?.user_name}</Typography>
         </>
       ) : (
-      <>  
-      <Typography>Your vault is empty</Typography>
-      <Typography>Save your passwords here to keep them safe and easy to access anytime.</Typography></>
+        <>
+          <Typography>Your vault is empty</Typography>
+          <Typography>
+            Save your passwords here to keep them safe and easy to access
+            anytime.
+          </Typography>
+        </>
       )}
     </>
   );

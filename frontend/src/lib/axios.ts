@@ -20,7 +20,8 @@ import axios from 'axios';
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem("token");
-      window.location.href = "/login";
+      localStorage.removeItem("authenticate");
+        window.location.href = "/";
     }
 
     return Promise.reject(error);

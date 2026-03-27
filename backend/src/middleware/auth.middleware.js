@@ -1,6 +1,7 @@
 import { validationResult } from 'express-validator';
 
 import jwt from "jsonwebtoken";
+import { User } from '../model/auth.model.js';
 
 export const errorHandler = (err, req, res, next) => {
   console.error(err);
@@ -23,8 +24,8 @@ export const protect = async (req, res, next) => {
       return res.status(401).json({ message: "Not authorized" });
     }
 
-    const decoded = jwt.verify(token, process.env.SECRET_KEY);
-
+    const decoded = await jwt.verify(token, process.env.SECRET_KEY);
+console.log(decoded)
     const user = await User.findById(decoded.id);
 
     if (!user) {
@@ -35,6 +36,7 @@ export const protect = async (req, res, next) => {
 
     next();
   } catch (error) {
+    console.log(error)
     if (error.name === "TokenExpiredError") {
       return res.status(401).json({ message: "Token expired" });
     }

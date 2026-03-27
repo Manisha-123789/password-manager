@@ -8,5 +8,5 @@ router.get('/password', protect, getUserData);
 router.post('/signup', validateCredentials, validateUser, createUser);
 router.post('/login', loginUser)
 router.get(`/verify/:token`, verifyEmailToken);
-router.post('/about/me', getUser)
+router.post('/about/me', protect, getUser)
 export default router;
