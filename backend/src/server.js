@@ -11,7 +11,7 @@ import { errorHandler } from './middleware/auth.middleware.js';
 const app = express();
 dotenv.config();
 connectDB();
-const PORT = process.env.PORT || 8050;
+const PORT = process.env.PORT || 8000;
 
 app.use(helmet());
 
@@ -22,7 +22,9 @@ app.use(
   })
 );
 app.use(errorHandler);
-app.use(cors());
+app.use(cors({
+  origin : "*"
+}));
 app.use(express.json());
 app.use('/user', userRoutes)
 
