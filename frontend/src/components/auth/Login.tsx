@@ -15,7 +15,7 @@ const Login = () => {
     email: '',
     password: '',
   });
-  const [apiError, setApiError] = useState();
+  const [apiError, setApiError] = useState('');
   const router = useRouter();
 
   const handleChange = (field: string, value: string) => {
@@ -29,7 +29,7 @@ const Login = () => {
       [field]: '',
     }));
 
-    setApiError();
+    setApiError('');
   };
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
