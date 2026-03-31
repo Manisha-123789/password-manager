@@ -23,7 +23,9 @@ app.use(
 );
 app.use(errorHandler);
 app.use(cors({
-  origin : "*"
+  origin : "https://password-manager-7ack1hnt3-manishas-projects-debafcfa.vercel.app/",
+    credentials: true
+
 }));
 app.use(express.json());
 app.use('/user', userRoutes)
