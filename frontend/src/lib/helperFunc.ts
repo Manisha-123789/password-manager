@@ -1,4 +1,4 @@
-export const validate = (name, email, password) => {
+export const validate = (name : string, email : string, password : string) => {
   const newErrors = {
     userName: '',
     email: '',
@@ -37,7 +37,7 @@ export const validate = (name, email, password) => {
 };
 
 
-export const loginValidate = (email, password) =>{
+export const loginValidate = (email : string, password : string) =>{
   const error = {
     email : '',
     password : ''

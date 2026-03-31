@@ -32,11 +32,10 @@ const Login = () => {
     setApiError('');
   };
 
-  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleLogin = async ( e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
     const error = loginValidate(form.email, form.password);
-    delete error?.userName;
     if (error.email || error.password) {
       setErrors(error);
     } else {
@@ -46,7 +45,7 @@ const Login = () => {
         localStorage.setItem('token', token);
         localStorage.setItem('authenticate', JSON.stringify(true));
         router.push('/');
-      } catch (error) {
+      } catch (error : any) {
         console.log(error?.response);
         setApiError(error.response.data.message ?? 'Something went wrong')
       }
@@ -69,7 +68,7 @@ const Login = () => {
           onChange={(e) => handleChange('password', e.target.value)}
           helperText={errors.password}
         />
-        <Button onClick={handleLogin}>Login</Button>
+        <Button  onClick={handleLogin}>Login</Button>
 
         <Button onClick={() => router.push('signup')}>New User Signup</Button>
       </Box>

@@ -1,9 +1,6 @@
 'use client';
 
-import { api } from '@/src/lib/axios';
-import { setAuthenticate } from '@/src/redux/features/auth/authSlice';
 import { userService } from '@/src/services/user.service';
-import { apiCall } from '@/src/utils/apiCall';
 import { Alert, Box, Button, Typography } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -16,7 +13,7 @@ interface PasswordData {
 }
 
 export const Home = () => {
-  const [data, setData] = useState<PasswordData | {}>({});
+  const [data, setData] = useState<PasswordData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticate] = useState<boolean>(false);
   const router = useRouter();
@@ -62,7 +59,7 @@ export const Home = () => {
           <Button onClick={() => router.push('signup')}>Create Account</Button>
           <Button onClick={() => router.push('login')}>Login</Button>
         </Box>
-      ) : Object.keys(data).length ? (
+      ) : data && Object.keys(data).length ? (
         <>
           <Typography>Website: {data?.website}</Typography>
           <Typography>User Name: {data?.user_name}</Typography>
