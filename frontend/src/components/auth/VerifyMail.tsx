@@ -18,10 +18,10 @@ const VerifyMail = () => {
       }
     };
 
-    window.addEventListener('storage', getUser);
+    window.addEventListener('focus', getUser);
 
     return () => {
-      window.removeEventListener('storage', getUser);
+      window.removeEventListener('focus', getUser);
     };
   }, []);
 

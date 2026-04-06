@@ -35,6 +35,12 @@ export const createUser = async (req, res, next) => {
       verification_token_expires: expires,
     });
 
+      var jwtToken = await jwt.sign(
+      { userName: user.userName, email: user.email, id: user._id },
+      SECRET_KEY,
+      {expiresIn : '1h'}
+    );
+
     const verifyLink = `${process.env.CLIENT_URL}/verify/${verification_token}`;
 
     await transporter.sendMail({
@@ -51,6 +57,7 @@ export const createUser = async (req, res, next) => {
     return res.status(201).json({
       success: true,
       message: 'User created successfully',
+      token: jwtToken,
       data: {
         id: user._id,
         email: user.email,
@@ -146,11 +153,6 @@ export const verifyEmailToken = async (req, res, next) => {
       return res.status(400).json({ message: 'Invalid or expired token' });
     }
 
-    var jwtToken = await jwt.sign(
-      { userName: user.userName, email: user.email, id: user._id },
-      SECRET_KEY,
-      {expiresIn : '1h'}
-    );
 
     user.isVerified = true;
     user.verification_token = undefined;
@@ -159,7 +161,6 @@ export const verifyEmailToken = async (req, res, next) => {
     await user.save();
     res.status(200).json({
       success: true,
-      token: jwtToken,
       message: 'Email verified successfully',
     });
   } catch (error) {

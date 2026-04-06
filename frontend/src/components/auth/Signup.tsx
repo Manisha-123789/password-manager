@@ -48,7 +48,7 @@ const Signup = () => {
         email: form.email,
         password: form.password,
       });
-      // localStorage.setItem('token', response?.token);
+      localStorage.setItem('token', response?.token);
       if (response?.success) {
         router.push('verify-mail');
       } 
@@ -60,6 +60,7 @@ const Signup = () => {
 
   useEffect(() => {
     localStorage.removeItem('token');
+    localStorage.removeItem('authenticate');
   }, []);
 
   return (
@@ -80,12 +81,13 @@ const Signup = () => {
             helperText={errors.email}
           />
           <TextField
+            name='password'
             label={'password'}
             value={form.password}
             onChange={(e) => handleChange('password', e.target.value)}
             helperText={errors.password}
           />
-          <Button onClick={handleSignup}>Create my Account</Button>
+          <Button type='submit' onClick={handleSignup}>Create my Account</Button>
           <Button onClick={()=>router.push('login')}>Already have an account? Log in</Button>
         </>
       )}

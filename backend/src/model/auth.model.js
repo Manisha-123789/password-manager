@@ -23,10 +23,10 @@ const userSchema = mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    verfication_token: {
+    verification_token: {
       type: String,
     },
-    verfication_token_expires: {
+    verification_token_expires: {
       type: Date,
     },
   },

@@ -19,8 +19,6 @@ export default function BlogPostPage({
     const verifyToken = async () => {
       try {
         const response = await authService.verifyEmail(slug);
-        const token = response.token;
-        localStorage.setItem('token', token);
         setTimeout(() => {
           window.close();
         }, 3000);

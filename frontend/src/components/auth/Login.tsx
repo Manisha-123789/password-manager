@@ -1,10 +1,10 @@
 'use client';
-import { loginValidate} from '@/src/lib/helperFunc';
+import { loginValidate } from '@/src/lib/helperFunc';
 import { authService } from '@/src/services/auth.service';
-import { Alert, Box, Button, TextField} from '@mui/material';
+import { Alert, Box, Button, TextField } from '@mui/material';
 import { useRouter } from 'next/navigation';
 
-import {useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const Login = () => {
   const [form, setForm] = useState({
@@ -32,7 +32,7 @@ const Login = () => {
     setApiError('');
   };
 
-  const handleLogin = async ( e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleLogin = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
     const error = loginValidate(form.email, form.password);
@@ -45,12 +45,17 @@ const Login = () => {
         localStorage.setItem('token', token);
         localStorage.setItem('authenticate', JSON.stringify(true));
         router.push('/');
-      } catch (error : any) {
+      } catch (error: any) {
         console.log(error?.response);
-        setApiError(error.response.data.message ?? 'Something went wrong')
+        setApiError(error.response.data.message ?? 'Something went wrong');
       }
     }
   };
+
+  useEffect(() => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('authenticate');
+  }, []);
 
   return (
     <>
@@ -68,7 +73,7 @@ const Login = () => {
           onChange={(e) => handleChange('password', e.target.value)}
           helperText={errors.password}
         />
-        <Button  onClick={handleLogin}>Login</Button>
+        <Button onClick={handleLogin}>Login</Button>
 
         <Button onClick={() => router.push('signup')}>New User Signup</Button>
       </Box>
