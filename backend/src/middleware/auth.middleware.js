@@ -8,7 +8,10 @@ export const errorHandler = (err, req, res, next) => {
 
   res.status(err.statusCode || 500).json({
     success: false,
+    statusCode: err.statusCode || 500,
     message: err.message || "Server Error",
+    data: null,
+    error: err.message || "Server Error",
   });
 };
 
@@ -21,7 +24,13 @@ export const protect = async (req, res, next) => {
     }
 
     if (!token) {
-      return res.status(401).json({ message: "Not authorized" });
+      return res.status(401).json({
+        success: false,
+        statusCode: 401,
+        message: "Not authorized",
+        data: null,
+        error: "Token not provided",
+      });
     }
 
     const decoded = await jwt.verify(token, process.env.SECRET_KEY);
@@ -29,7 +38,13 @@ console.log(decoded)
     const user = await User.findById(decoded.id);
 
     if (!user) {
-      return res.status(401).json({ message: "User not found" });
+      return res.status(401).json({
+        success: false,
+        statusCode: 401,
+        message: "User not found",
+        data: null,
+        error: "Invalid user",
+      });
     }
 
     req.user = user;
@@ -38,10 +53,22 @@ console.log(decoded)
   } catch (error) {
     console.log(error)
     if (error.name === "TokenExpiredError") {
-      return res.status(401).json({ message: "Token expired" });
+      return res.status(401).json({
+        success: false,
+        statusCode: 401,
+        message: "Token expired",
+        data: null,
+        error: error?.message || "TokenExpiredError",
+      });
     }
 
-    return res.status(401).json({ message: "Invalid token" });
+    return res.status(401).json({
+      success: false,
+      statusCode: 401,
+      message: "Invalid token",
+      data: null,
+      error: error?.message || "InvalidToken",
+    });
   }
 };
 
@@ -51,9 +78,11 @@ export const validateUser = (req, res, next) => {
   if (!errors.isEmpty()) {
     return res.status(422).json({
       success: false,
+      statusCode: 422,
+      message: errors.array()[0].msg,
+      data: null,
       error: {
         code: 'VALIDATION_ERROR',
-        message: errors.array()[0].msg,
         details: errors.array().map(err => ({
           field: err.path,
           message: err.msg,

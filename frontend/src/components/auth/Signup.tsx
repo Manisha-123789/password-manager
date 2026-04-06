@@ -48,13 +48,14 @@ const Signup = () => {
         email: form.email,
         password: form.password,
       });
-      localStorage.setItem('token', response?.token);
+      console.log(response)
+      localStorage.setItem('token', response?.data?.token);
       if (response?.success) {
         router.push('verify-mail');
       } 
     } catch (error: any) {
       const apiError = error?.response?.data;
-      setApiError(apiError?.error?.message ?? 'Something went wrong')
+      setApiError(apiError?.message ?? 'Something went wrong')
     }
   };
 

@@ -41,7 +41,8 @@ const Login = () => {
     } else {
       try {
         const response = await authService.login(form);
-        const token = response.token;
+        console.log(response)
+        const token = response?.data?.token;
         localStorage.setItem('token', token);
         localStorage.setItem('authenticate', JSON.stringify(true));
         router.push('/');
@@ -51,6 +52,12 @@ const Login = () => {
       }
     }
   };
+
+  const handlelResendVerificationEmail = async () =>{
+    setApiError('');
+    const response = await authService.sendVerificationLink({email : form.email});
+    console.log(response)
+  }
 
   useEffect(() => {
     localStorage.removeItem('token');
@@ -76,6 +83,7 @@ const Login = () => {
         <Button onClick={handleLogin}>Login</Button>
 
         <Button onClick={() => router.push('signup')}>New User Signup</Button>
+        <Button onClick={()=>handlelResendVerificationEmail()}>Resend Verification Email</Button>
       </Box>
     </>
   );

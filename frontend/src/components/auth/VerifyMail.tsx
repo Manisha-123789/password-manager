@@ -5,11 +5,13 @@ import { useEffect} from 'react';
 
 const VerifyMail = () => {
   useEffect(() => {
+    console.log('focus')
     const getUser = async () => {
       try {
         const token = localStorage.getItem('token') || '';
         const response = await authService.getUser({ token: token });
-        if (response?.isVerified) {
+        console.log(response,' this is ')
+        if (response?.data?.isVerified) {
           localStorage.setItem('authenticate', JSON.stringify(true));
           window.location.href = '/';
         }

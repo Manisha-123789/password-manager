@@ -20,6 +20,10 @@ class AuthService extends BaseService {
   async getUser(data : {token : string}){
     return this.post<any>("/user/about/me", data)
   }
+
+  async sendVerificationLink(data : {email : string}){
+    return this.patch<any>('/user/resend-verification', data)
+  }
 }
 
 export const authService = new AuthService();

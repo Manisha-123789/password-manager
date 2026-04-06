@@ -18,6 +18,11 @@ export class BaseService {
     return response.data;
   }
 
+   protected async patch<T>(url: string, data?: any): Promise<T> {
+    const response = await api.patch(url, data);
+    return response.data;
+  }
+
   protected async delete<T>(url: string): Promise<T> {
     const response = await api.delete(url);
     return response.data;
